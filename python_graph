@@ -1,0 +1,76 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import sys, time, math
+import serial
+
+ser = serial.Serial(
+port='COM8',
+baudrate=115200,
+parity=serial.PARITY_NONE,
+stopbits=serial.STOPBITS_ONE, #scon 0x10 means stopbit 1?
+bytesize=serial.EIGHTBITS
+)
+
+fig=plt.figure()
+xsize =100
+xdata,ydata=[],[]
+ax = fig.add_subplot(111)
+line, = ax.plot([], [], lw=2,color='red')
+
+peak_line= ax.axhline(y=0,color='blue',linestyle='--',alpha=0.5,label='Peak BPM')
+peak_text=ax.text(0.02,0.95,'Peak:0.00 BPM',transform=ax.transAxes,color='blue',fontweight='bold')
+av_text=ax.text(0.02,0.90,'Avg:0.00 BPM',transform=ax.transAxes,color='green',fontweight='bold')
+
+ax.set_ylim(0, 200)
+ax.set_xlim(0, xsize)
+ax.grid()
+max_bpm=0
+
+ax.set_title("Heart Rate Monitor")
+ax.set_ylabel("Beats Per Minute")
+ax.legend(loc='upper right')
+
+def data_gen():
+    t=0
+    past=70
+    while True:
+            temp_line=ser.readline()
+            string_data=temp_line.decode('utf-8').strip()
+
+            if len(string_data) > 0:
+                try:
+                    period=float(string_data)
+                    if period >0:
+                            bpm=60.0/period
+                            if(bpm>120):
+                                  bpm=past
+                            t+=1
+                            past=bpm
+                            yield t,bpm
+                except ValueError:
+                    pass       
+def run(data):
+      global max_bpm
+      t,y=data
+      xdata.append(t)
+      ydata.append(y)
+      #records max_temp writes it to peak_text
+      if y>max_bpm:
+            max_bpm=y
+            peak_line.set_ydata([max_bpm])
+            peak_text.set_text(f'Peak:{max_bpm:.2f}BPM')
+            
+    #records mean using mean funct
+      if len(ydata)>0:
+            avg_val=np.mean(ydata)
+            av_text.set_text(f'Average:{avg_val:.2f}BPM')
+
+        
+      if t>xsize:
+            ax.set_xlim(t-xsize,t)
+      line.set_data(xdata,ydata)
+      return line,peak_line,peak_text,av_text
+
+ani=animation.FuncAnimation(fig,run,data_gen,blit=False,interval=10,repeat=False)
+plt.show()                

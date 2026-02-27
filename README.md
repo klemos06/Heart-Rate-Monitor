@@ -1,4 +1,4 @@
-## **Heart Rate Monitor**
+# Heart Rate Monitor
 
 The Heart Rate Monitor is a real-time medical system that captures human heart activity through **Photoplethysmography**, measuring heart activity through changes in infrared light absorption and allowing for non-invasive analysis of the human body.
 

@@ -4,7 +4,12 @@ The Heart Rate Monitor is a real-time medical system that captures human heart a
 
 This project focuses on using an EFM8LB1 Lazer Bee microcontroller connected to a finger-clip to measure real-time heart rate in C and amplifying this output for BPM and heart pulse visualization using a GUI.
 
-
+**Update**
+* Replaced EFM8LB1 microcontroller with a PIC32 microcontroller for improved sampling.
+* Integrated an emailing function on GUI for average BPM results with the click of a button.
+* Implemented Pause function for graph to allow graph analysis.
+* Added RC Low Pass Filter to clean up Schmitt Trigger Output to microcontroller.
+  
 # Features
 
 **Signal Processing & Hardware**
